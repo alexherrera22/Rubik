@@ -1,0 +1,450 @@
+﻿<!DOCTYPE html >
+<html>
+<head>
+    <title>Cubo de Rubik</title>
+    <script type="text/javascript">
+        var canvas;
+        var context;
+        var caras = {
+            "verde": { "fila1": ["green", "green", "green"], "fila2": ["green", "green", "green"], "fila3": ["green", "green", "green"], "Iniciox": 140, "Inicioy": 140 },
+            "amarillo": { "fila1": ["yellow", "yellow", "yellow"], "fila2": ["yellow", "yellow", "yellow"], "fila3": ["yellow", "yellow", "yellow"], "Iniciox": 78, "Inicioy": 108 },
+            "rojo": { "fila1": ["red", "red", "red"], "fila2": ["red", "red", "red"], "fila3": ["red", "red", "red"], "Iniciox": 78, "Inicioy": 108 },
+            "blanco": { "fila1": ["white", "white", "white"], "fila2": ["white", "white", "white"], "fila3": ["white", "white", "white"], "Iniciox": 260, "Inicioy": 170 },
+            "naranja": { "fila1": ["orange", "orange", "orange"], "fila2": ["orange", "orange", "orange"], "fila3": ["orange", "orange", "orange"], "Iniciox": 260, "Inicioy": 108 },
+            "azul": { "fila1": ["blue", "blue", "blue"], "fila2": ["blue", "blue", "blue"], "fila3": ["blue", "blue", "blue"], "Iniciox": 322, "Inicioy": 76 }
+        }
+
+        //Funciones para girar
+        function GirarCara(cara) {
+            //Esquinas
+            var tmp = cara.fila1[0];
+            cara.fila1[0] = cara.fila3[0];
+            cara.fila3[0] = cara.fila3[2];
+            cara.fila3[2] = cara.fila1[2];
+            cara.fila1[2] = tmp;
+
+            //Aristas
+            tmp = cara.fila1[1];
+            cara.fila1[1] = cara.fila2[0];
+            cara.fila2[0] = cara.fila3[1];
+            cara.fila3[1] = cara.fila2[2];
+            cara.fila2[2] = tmp;
+        }
+
+        caras.verde.GirarDerecha = function () {
+            GirarCara(caras.verde);
+            //Laterales
+
+            var tmp1 = caras.amarillo.fila3[0];
+            var tmp2 = caras.amarillo.fila3[1];
+            var tmp3 = caras.amarillo.fila3[2];
+
+            caras.amarillo.fila3[0] = caras.rojo.fila3[2];
+            caras.amarillo.fila3[1] = caras.rojo.fila2[2];
+            caras.amarillo.fila3[2] = caras.rojo.fila1[2];
+
+            caras.rojo.fila3[2] = caras.blanco.fila1[2];
+            caras.rojo.fila2[2] = caras.blanco.fila1[1];
+            caras.rojo.fila1[2] = caras.blanco.fila1[0];
+
+            caras.blanco.fila1[2] = caras.naranja.fila1[0];
+            caras.blanco.fila1[1] = caras.naranja.fila2[0];
+            caras.blanco.fila1[0] = caras.naranja.fila3[0];
+
+            caras.naranja.fila1[0] = tmp1;
+            caras.naranja.fila2[0] = tmp2;
+            caras.naranja.fila3[0] = tmp3;
+        };
+
+        caras.amarillo.GirarDerecha = function () {
+            GirarCara(caras.amarillo);
+
+            //Laterales
+            var tmp1 = caras.azul.fila1[0];
+            var tmp2 = caras.azul.fila1[1];
+            var tmp3 = caras.azul.fila1[2];
+
+            caras.azul.fila1[0] = caras.rojo.fila1[0];
+            caras.azul.fila1[1] = caras.rojo.fila1[1];
+            caras.azul.fila1[2] = caras.rojo.fila1[2];
+
+            caras.rojo.fila1[0] = caras.verde.fila1[0]
+            caras.rojo.fila1[1] = caras.verde.fila1[1]
+            caras.rojo.fila1[2] = caras.verde.fila1[2]
+
+            caras.verde.fila1[0] = caras.naranja.fila1[0]
+            caras.verde.fila1[1] = caras.naranja.fila1[1]
+            caras.verde.fila1[2] = caras.naranja.fila1[2]
+
+            caras.naranja.fila1[0] = tmp1;
+            caras.naranja.fila1[1] = tmp2;
+            caras.naranja.fila1[2] = tmp3;
+        };
+
+        caras.naranja.GirarDerecha = function () {
+            GirarCara(caras.naranja);
+            //Laterales
+            var tmp1 = caras.amarillo.fila3[2];
+            var tmp2 = caras.amarillo.fila2[2];
+            var tmp3 = caras.amarillo.fila1[2];
+
+            caras.amarillo.fila3[2] = caras.verde.fila3[2];
+            caras.amarillo.fila2[2] = caras.verde.fila2[2];
+            caras.amarillo.fila1[2] = caras.verde.fila1[2];
+
+            caras.verde.fila3[2] = caras.blanco.fila3[2];
+            caras.verde.fila2[2] = caras.blanco.fila2[2];
+            caras.verde.fila1[2] = caras.blanco.fila1[2];
+
+            caras.blanco.fila3[2] = caras.azul.fila1[0];
+            caras.blanco.fila2[2] = caras.azul.fila2[0];
+            caras.blanco.fila1[2] = caras.azul.fila3[0];
+
+            caras.azul.fila1[0] = tmp1;
+            caras.azul.fila2[0] = tmp2;
+            caras.azul.fila3[0] = tmp3;
+        };
+
+        caras.rojo.GirarDerecha = function () {
+            GirarCara(caras.rojo);
+            //Laterales
+            var tmp1 = caras.verde.fila1[0];
+            var tmp2 = caras.verde.fila2[0];
+            var tmp3 = caras.verde.fila3[0];
+
+            caras.verde.fila1[0] = caras.amarillo.fila1[0];
+            caras.verde.fila2[0] = caras.amarillo.fila2[0];
+            caras.verde.fila3[0] = caras.amarillo.fila3[0];
+
+            caras.amarillo.fila1[0] = caras.azul.fila3[2];
+            caras.amarillo.fila2[0] = caras.azul.fila2[2];
+            caras.amarillo.fila3[0] = caras.azul.fila1[2];
+
+            caras.azul.fila3[2] = caras.blanco.fila1[0];
+            caras.azul.fila2[2] = caras.blanco.fila2[0];
+            caras.azul.fila1[2] = caras.blanco.fila3[0];
+
+            caras.blanco.fila1[0] = tmp1;
+            caras.blanco.fila2[0] = tmp2;
+            caras.blanco.fila3[0] = tmp3;
+
+        };
+
+        caras.blanco.GirarDerecha = function () {
+            GirarCara(caras.blanco);
+            //Laterales
+            var tmp = caras.verde.fila3;
+
+            caras.verde.fila3 = caras.rojo.fila3;
+            caras.rojo.fila3 = caras.azul.fila3;
+            caras.azul.fila3 = caras.naranja.fila3;
+            caras.naranja.fila3 = tmp;
+
+        };
+
+        caras.azul.GirarDerecha = function () {
+            GirarCara(caras.azul);
+            //Laterales
+            var tmp1 = caras.naranja.fila1[2];
+            var tmp2 = caras.naranja.fila2[2];
+            var tmp3 = caras.naranja.fila3[2];
+
+            caras.naranja.fila1[2] = caras.blanco.fila3[2];
+            caras.naranja.fila2[2] = caras.blanco.fila3[1];
+            caras.naranja.fila3[2] = caras.blanco.fila3[0];
+
+            caras.blanco.fila3[2] = caras.rojo.fila3[0];
+            caras.blanco.fila3[1] = caras.rojo.fila2[0];
+            caras.blanco.fila3[0] = caras.rojo.fila1[0];
+
+            caras.rojo.fila3[0] = caras.amarillo.fila1[0];
+            caras.rojo.fila2[0] = caras.amarillo.fila1[1];
+            caras.rojo.fila1[0] = caras.amarillo.fila1[2];
+
+            caras.amarillo.fila1[0] = tmp1;
+            caras.amarillo.fila1[1] = tmp2;
+            caras.amarillo.fila1[2] = tmp3;
+        };
+
+        //Fin funciones para girar
+
+        //Eventos
+        function document_load() {
+            canvas = document.getElementById("rubik");
+            context = canvas.getContext("2d");
+            DibujarCubo();
+        }
+
+
+        function VerdeDerecha_click() {
+            caras.verde.GirarDerecha();
+            DibujarCubo();
+        }
+        function VerdeIzquierda_click() {
+            caras.verde.GirarDerecha();
+            caras.verde.GirarDerecha();
+            caras.verde.GirarDerecha();
+            DibujarCubo();
+        }
+
+        function AmarilloDerecha_click() {
+            caras.amarillo.GirarDerecha();
+            DibujarCubo();
+        }
+        function AmarilloIzquierda_click() {
+            caras.amarillo.GirarDerecha();
+            caras.amarillo.GirarDerecha();
+            caras.amarillo.GirarDerecha();
+            DibujarCubo();
+        }
+
+        function NaranjaDerecha_click() {
+            caras.naranja.GirarDerecha();
+            DibujarCubo();
+        }
+        function NaranjaIzquierda_click() {
+            caras.naranja.GirarDerecha();
+            caras.naranja.GirarDerecha();
+            caras.naranja.GirarDerecha();
+            DibujarCubo();
+        }
+
+        function RojoDerecha_click() {
+            caras.rojo.GirarDerecha();
+            DibujarCubo();
+        }
+        function RojoIzquierda_click() {
+            caras.rojo.GirarDerecha();
+            caras.rojo.GirarDerecha();
+            caras.rojo.GirarDerecha();
+            DibujarCubo();
+        }
+
+        function BlancoDerecha_click() {
+            caras.blanco.GirarDerecha();
+            DibujarCubo();
+        }
+        function BlancoIzquierda_click() {
+            caras.blanco.GirarDerecha();
+            caras.blanco.GirarDerecha();
+            caras.blanco.GirarDerecha();
+            DibujarCubo();
+        }
+
+        function AzulDerecha_click() {
+            caras.azul.GirarDerecha();
+            DibujarCubo();
+        }
+        function AzulIzquierda_click() {
+            caras.azul.GirarDerecha();
+            caras.azul.GirarDerecha();
+            caras.azul.GirarDerecha();
+            DibujarCubo();
+        }
+
+        function reset_click() {
+            caras.verde.fila1 = ["green", "green", "green"];
+            caras.verde.fila2 = ["green", "green", "green"];
+            caras.verde.fila3 = ["green", "green", "green"];
+
+            caras.amarillo.fila1 = ["yellow", "yellow", "yellow"];
+            caras.amarillo.fila2 = ["yellow", "yellow", "yellow"];
+            caras.amarillo.fila3 = ["yellow", "yellow", "yellow"];
+
+            caras.blanco.fila1 = ["white", "white", "white"];
+            caras.blanco.fila2 = ["white", "white", "white"];
+            caras.blanco.fila3 = ["white", "white", "white"];
+
+            caras.rojo.fila1 = ["red", "red", "red"];
+            caras.rojo.fila2 = ["red", "red", "red"];
+            caras.rojo.fila3 = ["red", "red", "red"];
+
+            caras.naranja.fila1 = ["orange", "orange", "orange"];
+            caras.naranja.fila2 = ["orange", "orange", "orange"];
+            caras.naranja.fila3 = ["orange", "orange", "orange"];
+
+            caras.azul.fila1 = ["blue", "blue", "blue"];
+            caras.azul.fila2 = ["blue", "blue", "blue"];
+            caras.azul.fila3 = ["blue", "blue", "blue"];
+
+            DibujarCubo();
+        }
+
+        //Fin Eventos
+
+        //Funciones para dibujar
+        caras.verde.Dibujar = function () {
+            //Dibujar fila superior
+            var xBase = this.Iniciox;
+            var yBase = this.Inicioy;
+            DibujarCuadro1(this.fila1[0], xBase, yBase);
+            DibujarCuadro1(this.fila1[1], xBase + 21, yBase - 11);
+            DibujarCuadro1(this.fila1[2], xBase + 42, yBase - 22);
+
+            yBase += 21;
+            DibujarCuadro1(this.fila2[0], xBase, yBase);
+            DibujarCuadro1(this.fila2[1], xBase + 21, yBase - 11);
+            DibujarCuadro1(this.fila2[2], xBase + 42, yBase - 22);
+            yBase += 21;
+            DibujarCuadro1(this.fila3[0], xBase, yBase);
+            DibujarCuadro1(this.fila3[1], xBase + 21, yBase - 11);
+            DibujarCuadro1(this.fila3[2], xBase + 42, yBase - 22);
+
+        };
+
+        caras.rojo.Dibujar = function () {
+            var xBase = this.Iniciox;
+            var yBase = this.Inicioy;
+
+            DibujarCuadro2(this.fila1[0], xBase, yBase);
+            DibujarCuadro2(this.fila1[1], xBase + 21, yBase + 11);
+            DibujarCuadro2(this.fila1[2], xBase + 42, yBase + 22);
+
+            yBase += 21;
+            DibujarCuadro2(this.fila2[0], xBase, yBase);
+            DibujarCuadro2(this.fila2[1], xBase + 21, yBase + 11);
+            DibujarCuadro2(this.fila2[2], xBase + 42, yBase + 22);
+
+            yBase += 21;
+            DibujarCuadro2(this.fila3[0], xBase, yBase);
+            DibujarCuadro2(this.fila3[1], xBase + 21, yBase + 11);
+            DibujarCuadro2(this.fila3[2], xBase + 42, yBase + 22);
+        };
+
+        caras.amarillo.Dibujar = function () {
+            var xBase = this.Iniciox;
+            var yBase = this.Inicioy;
+
+            DibujarCuadro3(this.fila1[0], xBase, yBase);
+            DibujarCuadro3(this.fila1[1], xBase + 21, yBase - 11);
+            DibujarCuadro3(this.fila1[2], xBase + 42, yBase - 22);
+
+            xBase += 21;
+            yBase += 11;
+
+            DibujarCuadro3(this.fila2[0], xBase, yBase);
+            DibujarCuadro3(this.fila2[1], xBase + 21, yBase - 11);
+            DibujarCuadro3(this.fila2[2], xBase + 42, yBase - 22);
+
+            xBase += 21;
+            yBase += 11;
+
+            DibujarCuadro3(this.fila3[0], xBase, yBase);
+            DibujarCuadro3(this.fila3[1], xBase + 21, yBase - 11);
+            DibujarCuadro3(this.fila3[2], xBase + 42, yBase - 22);
+        };
+
+        caras.naranja.Dibujar = caras.verde.Dibujar;
+        caras.azul.Dibujar = caras.rojo.Dibujar;
+        caras.blanco.Dibujar = function () {
+            var xBase = this.Iniciox;
+            var yBase = this.Inicioy;
+
+            DibujarCuadro3(this.fila1[0], xBase + 42, yBase + 22);
+            DibujarCuadro3(this.fila1[1], xBase + 21, yBase + 11);
+            DibujarCuadro3(this.fila1[2], xBase, yBase);
+
+            xBase += 21;
+            yBase -= 11;
+
+            DibujarCuadro3(this.fila2[0], xBase + 42, yBase + 22);
+            DibujarCuadro3(this.fila2[1], xBase + 21, yBase + 11);
+            DibujarCuadro3(this.fila2[2], xBase, yBase);
+
+            xBase += 21;
+            yBase -= 11;
+
+            DibujarCuadro3(this.fila3[0], xBase + 42, yBase + 22);
+            DibujarCuadro3(this.fila3[1], xBase + 21, yBase + 11);
+            DibujarCuadro3(this.fila3[2], xBase, yBase);
+        };
+
+        function DibujarCuadro1(Color, x, y) {
+            context.strokeStyle = "black";
+            context.fillStyle = Color;
+            context.beginPath();
+            context.moveTo(x, y);
+            context.lineTo(x + 20, y - 10);
+            context.lineTo(x + 20, y + 10);
+            context.lineTo(x, y + 20);
+            context.closePath();
+            context.fill();
+            context.stroke();
+        }
+
+        function DibujarCuadro2(Color, x, y) {
+            context.strokeStyle = "black";
+            context.fillStyle = Color;
+            context.beginPath();
+            context.moveTo(x, y);
+            context.lineTo(x + 20, y + 10);
+            context.lineTo(x + 20, y + 30);
+            context.lineTo(x, y + 20);
+            context.closePath();
+            context.fill();
+            context.stroke();
+        }
+
+        function DibujarCuadro3(Color, x, y) {
+            context.strokeStyle = "black";
+            context.fillStyle = Color;
+            context.beginPath();
+            context.moveTo(x, y);
+            context.lineTo(x + 20, y - 10);
+            context.lineTo(x + 40, y);
+            context.lineTo(x + 20, y + 10);
+            context.closePath();
+            context.fill();
+            context.stroke();
+        }
+
+
+
+        function DibujarCubo() {
+            //DibujarCara(caras.verde);
+            caras.verde.Dibujar();
+            caras.amarillo.Dibujar();
+            caras.rojo.Dibujar();
+            caras.blanco.Dibujar();
+            caras.naranja.Dibujar();
+            caras.azul.Dibujar();
+        }
+
+        //Fin funciones para dibujar
+
+    </script>
+    <style type="text/css">
+        input
+        {
+            width: 150px;
+        }
+        canvas
+        {
+            background-color: Gray;
+        }
+    </style>
+</head>
+<body onload="document_load()">
+    <canvas id="rubik" width="450px" height="300px">
+    </canvas>
+    <br />
+    <input type="button" value="Verde Derecha" id="VerdeDerecha" onclick="VerdeDerecha_click();" />
+    <input type="button" value="Verde Izquierda" id="VerdeIzquierda" onclick="VerdeIzquierda_click();" />
+    <br />
+    <input type="button" value="Amarillo Derecha" id="AmarilloDerecha" onclick="AmarilloDerecha_click();" />
+    <input type="button" value="Amarillo Izquierda" id="AmarilloIzquierda" onclick="AmarilloIzquierda_click();" />
+    <br />
+    <input type="button" value="Naranja Derecha" id="NaranjaDerecha" onclick="NaranjaDerecha_click();" />
+    <input type="button" value="Naranja Izquierda" id="NaranjaIzquierda" onclick="NaranjaIzquierda_click();" />
+    <br />
+    <input type="button" value="Rojo Derecha" id="RojoDerecha" onclick="RojoDerecha_click();" />
+    <input type="button" value="Rojo Izquierda" id="RojoIzquierda" onclick="RojoIzquierda_click();" />
+    <br />
+    <input type="button" value="Blanco Derecha" id="BlancoDerecha" onclick="BlancoDerecha_click();" />
+    <input type="button" value="Blanco Izquierda" id="BlancoIzquierda" onclick="BlancoIzquierda_click();" />
+    <br />
+    <input type="button" value="Azul Derecha" id="AzulDerecha" onclick="AzulDerecha_click();" />
+    <input type="button" value="Azul Izquierda" id="AzulIzquierda" onclick="AzulIzquierda_click();" />
+    <input type="button" value="reset" id="reset" onclick="reset_click();" />
+</body>
+</html>
